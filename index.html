@@ -4,7 +4,43 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        
+        <div id="sectionsContainer">
+            <div id="simContainer"></div>
+            <div id="settingsContainer">
+                <h1 id="title">Dijkstra Algorithm Simulator</h1>
+                <div id="generateSettings">
+                    <div>
+                        <label for="numberOfRouters">Routers: </label>
+                        <input id="numberOfRouters" type="number" min="2" max="10" value="5">
+                    </div>
+                    <button class="generateButton">Generate graph</button>
+                </div>
+                <div id="executionButtonsContainer">
+                    <button class="executeBtn">Execute 1</button>
+                    <button class="executeBtn">Execute 2</button>
+                    <button class="executeBtn">Execute 3</button>
+                </div>
+            </div>
+            <div id="logContainer">
+                <button class="clearBtn">Clear</button>
+                <div id="logs">
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                    logs will appear here. <br>
+                </div>
+            </div>
+        </div>
         <script src="index.js"></script>
     </body>
 </html>
