@@ -25,6 +25,30 @@ body {
     border-radius: 10px; 
 }
 
+@keyframes routerIn {
+    0% {
+        opacity: 0;
+        scale: 0.9;
+    }
+    70% {
+        opacity: 1;
+        scale: 1.2;
+    }
+    100% {
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+@keyframes lineIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 
 #sectionsContainer {
     display: grid;
@@ -47,8 +71,53 @@ body {
 }
 
 #simContainer {
+    position: relative;
     grid-area: simContainer;
     border-radius: 20px 5px 5px 20px;
+    padding: 10px;
+}
+
+.routerElement {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid gray;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+    z-index: 2;
+    cursor: pointer;
+    transition: 0.2s ease all;
+    animation: routerIn 0.4s ease forwards;
+}
+
+.routerElement:hover {
+    scale: 1.05;
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+}
+
+.routerElement:active {
+    scale: 0.98;
+    box-shadow: 0 0 0 transparent;
+}
+
+.routerLabel {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.connectionLine {
+    position: absolute;
+    height: 2px;
+    background-color: black;
+    transform-origin: 0 50%;
+    z-index: 1;
+    opacity: 0;
+    animation: lineIn 0.2s 0.3s ease forwards;
 }
 
 #settingsContainer {
