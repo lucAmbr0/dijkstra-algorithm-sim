@@ -18,6 +18,8 @@ let nodes = [];
 let numberOfRouters = 0;
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"];
 
+
+generateGraph();
 function generateGraph() {
     try {
         numberOfRouters = document.getElementById("numberOfRouters").value;
@@ -47,7 +49,7 @@ function generateGraph() {
 
 function generateConnections() {
     for (let node of nodes) {
-        const numOfConn = Math.floor(Math.random() * 1) + 2; // da 1 a 3 connessioni per ogni router
+        const numOfConn = Math.floor(Math.random() * 3) + 1; // da 1 a 3 connessioni per ogni router
         for (let i = node.connections.length; i < numOfConn; i++) {
             let dest = 0;
             do { // evita connessioni con se stesso e connessioni duplicate
@@ -79,7 +81,7 @@ function generateRouterUI() {
             const dx = circle.x - x;
             const dy = circle.y - y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            return distance - 100 < circleDiameter; // avoids routers to be too close to each other or to the border
+            return distance - 100 < circleDiameter; // evita che i router siano troppo vicini tra loro o ai bordi
         });
     }
 
@@ -87,6 +89,7 @@ function generateRouterUI() {
         let x, y;
         let attempts = 0;
         do {
+            // sceglie casualmente la posizione dei router nello spazio
             x = Math.random() * (containerWidth - circleDiameter - 2 * margin) + radius + margin;
             y = Math.random() * (containerHeight - circleDiameter - 2 * margin) + radius + margin;
             attempts++;
@@ -94,6 +97,7 @@ function generateRouterUI() {
         } while (isOverlapping(x, y));
 
         if (attempts <= 1000) {
+            // calcolo posizione e dimensioni dei cerchi da disegnare
             circles.push({ x, y });
             const circle = node.routerElement;
             circle.style.position = "absolute";
@@ -109,7 +113,7 @@ function generateRouterUI() {
 function generateConnectionsUI() {
     for (node of nodes) {
         for (conn of node.connections) {
-            if (nodes.find(n => n.name == conn.to)) {
+            if (nodes.find(n => n.name == conn.to)) { // se il router cercato ha una connessione con il nome del router corrente aggiungi una connessione
                 drawConnection(node, nodes.find(n => n.name == conn.to));
             }
         }
@@ -118,6 +122,7 @@ function generateConnectionsUI() {
 
 function drawConnection(node1, node2) {
     if (!node1 || !node2) return;
+    // se esiste già un collegamento tra i due router, non crearne un altro
     if (node1.connections.find(c => c.to == node2.name).linkElement) return;
     if (node2.connections.find(c => c.to == node1.name).linkElement) return;
 
@@ -127,24 +132,26 @@ function drawConnection(node1, node2) {
     const rect1 = node1Element.getBoundingClientRect();
     const rect2 = node2Element.getBoundingClientRect();
 
-    const x1 = rect1.left + rect1.width / 2;
-    const y1 = rect1.top + rect1.height / 2;
-    const x2 = rect2.left + rect2.width / 2;
-    const y2 = rect2.top + rect2.height / 2;
+    const x1 = rect1.left + rect1.width / 2; // trova il centro x del router 1
+    const y1 = rect1.top + rect1.height / 2; // trova il centro y del router 1
+    const x2 = rect2.left + rect2.width / 2; // x2
+    const y2 = rect2.top + rect2.height / 2; // y2
 
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const length = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const dx = x2 - x1; // calcola la distanza x tra i router
+    const dy = y2 - y1; // calcola la distanza y tra i router
+    const length = Math.sqrt(dx * dx + dy * dy); // calcola la lunghezza del collegamento
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI); // calcola l'angolo del collegamento in gradi
 
-    const line = document.createElement("div");
+    const line = document.createElement("div"); // elemento linea
     line.classList.add("connectionLine");
     line.id = `line_${node1Element.id}_${node2Element.id}`;
     line.style.width = `${length}px`;
     line.style.transform = `rotate(${angle}deg)`;
+    // gli estremi della linea terminano al centro dei router
     line.style.left = `${x1 - 50}px`;
     line.style.top = `${y1 - 25}px`;
 
+    // assegna l'elemento linea all'array di connessioni dei router
     node1.connections.find(c => c.to == node2.name).linkElement = line;
     node2.connections.find(c => c.to == node1.name).linkElement = line;
 
