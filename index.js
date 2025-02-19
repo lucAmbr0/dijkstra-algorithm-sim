@@ -12,6 +12,7 @@ class Node {
     }
     routerElement;
     connections = [];
+    distances = [];
 }
 
 let nodes = [];
@@ -40,7 +41,7 @@ function generateGraph() {
             generateRouterUI();
             generateConnections();
             generateConnectionsUI();
-
+            generateDistancesTable();
         }
     } catch (e) {
         console.error(e);
@@ -164,4 +165,20 @@ function drawConnection(node1, node2) {
     node2.connections.find(c => c.to == node1.name).linkElement = line;
 
     simContainer.appendChild(line);
+}
+
+function generateDistancesTable() {
+    for (node of nodes) {
+        node.distances = [];
+        node
+        .forEach(n => {
+            if (n.connections.find(c => c.to == node.name) != undefined) {
+                // per ogni nodo, se trova una connessione (diretta) esistente la ricopia nella tabella delle distanze
+                node.distances.push(n.connections.find(c => c.to == node.name));
+            } else {
+                // per tutti gli altri nodi aggiunge una distanza infinita provvisoria
+                node.distances.push(new Connection(n.name, Infinity));
+            }
+            });
+    }
 }

@@ -93,6 +93,7 @@ body {
     background-color: rgb(255, 255, 255);
     z-index: 2;
     cursor: pointer;
+    opacity: 0;
     animation: routerIn 0.4s ease forwards;
     transition: 0.2s ease all;
 }
@@ -190,15 +191,13 @@ body {
 
 #logContainer {
     grid-area: logContainer;
-    border-radius: 0px 5px 5px 5px;
     display: flex;
     flex-direction: column;
-    text-wrap: wrap;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    border-radius: 0px 5px 5px 5px;
 }
 
 .clearBtn {
+    position: sticky;
     width: fit-content;
     height: fit-content;
     padding: 2px 5px;
@@ -212,4 +211,8 @@ body {
 #logs {
     font-size: 14px;
     font-family: monospace;
+    display: flex;
+    text-wrap: wrap;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
