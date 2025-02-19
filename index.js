@@ -42,6 +42,7 @@ function generateGraph() {
             generateConnections();
             generateConnectionsUI();
             generateDistancesTable();
+            generateTableUI();
         }
     } catch (e) {
         console.error(e);
@@ -170,8 +171,7 @@ function drawConnection(node1, node2) {
 function generateDistancesTable() {
     for (node of nodes) {
         node.distances = [];
-        node
-        .forEach(n => {
+        nodes.forEach(n => {
             if (n.connections.find(c => c.to == node.name) != undefined) {
                 // per ogni nodo, se trova una connessione (diretta) esistente la ricopia nella tabella delle distanze
                 node.distances.push(n.connections.find(c => c.to == node.name));
@@ -180,5 +180,40 @@ function generateDistancesTable() {
                 node.distances.push(new Connection(n.name, Infinity));
             }
             });
+    }
+}
+
+function generateTableUI() {
+    const table = document.getElementById("distancesTable");
+    const x = nodes.length;
+    table.innerHTML = '';
+    for (let row = 0; row < x + 1; row++) {
+      const tr = document.createElement('tr');
+      tr.id = `row_${row}`;
+      tr.classList.add('row');
+      for (let col = 0; col < x + 1; col++) {
+        const td = document.createElement('td'); // Create a new cell
+        td.id = `cell_${row}_${col}`;
+        tr.appendChild(td); // Append the cell to the row
+      }
+      table.appendChild(tr); // Append the row to the table
+    }
+    document.getElementById('cell_0_0').textContent = ''; // svuota l'angolo in alto a sinistra
+    // scrive le intestazioni di righe e colonne
+    for (let i = 1; i <= x; i++) {
+        document.getElementById(`cell_${0}_${i}`).textContent = letters[i - 1];
+        document.getElementById(`cell_${i}_${0}`).textContent = letters[i - 1];
+    }
+    // scrive le distanze nella tabella
+    updateDistancesTable();
+  }
+
+function updateDistancesTable() {
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = 0; j < nodes.length; j++) {
+            let cellContent = nodes[i].distances[j].distance;
+            cellContent = cellContent == Infinity ? "∞" : cellContent;
+            document.getElementById(`cell_${i + 1}_${j + 1}`).textContent = cellContent;
+        }
     }
 }

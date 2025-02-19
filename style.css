@@ -3,6 +3,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: rgb(20, 20, 20);
+    color: rgb(20,20,20);
     font-family: 'Segoe UI', Calibri, Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -21,7 +22,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: transparent;
     border-radius: 10px; 
 }
 
@@ -129,6 +130,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 10px;
+    overflow: hidden;
 }
 
 .generateButton {
@@ -137,7 +139,7 @@ body {
     padding: 5px 10px;
     border-radius: 50px;
     border: solid 1px rgb(20,20,20);
-    margin: 10px 0;
+    margin: 10px 4px;
     cursor: pointer;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     transition: 0.2s ease all;
@@ -175,7 +177,7 @@ body {
 
 .executeBtn {
     border-radius: 10px;
-    margin: 5px 0;
+    margin: 5px 4px;
     border: solid 1px rgb(20, 20, 20);
     padding: 20px 10px;
     font-size: 18px;
@@ -187,6 +189,36 @@ body {
 .executeBtn:active {
     scale: 0.97;
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.tableContainer {
+    overflow-y: scroll;
+    overflow-x: scroll;
+    padding-left: 4px;
+}
+
+table {
+    background-color: rgb(230, 230, 230);
+    border: solid 1px rgb(20, 20, 20);
+    border-radius: 10px;
+    padding: 5px;
+    width: 100%;
+    table-layout: fixed;
+}
+
+table td {
+    padding: 5px;
+    width: fit-content;
+}
+
+tr:first-child,
+tr td:first-child {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+td:not(:first-child) {
+    width: 1fr;
 }
 
 #logContainer {
