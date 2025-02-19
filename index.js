@@ -50,17 +50,25 @@ function generateGraph() {
 function generateConnections() {
     for (let node of nodes) {
         const numOfConn = Math.floor(Math.random() * 3) + 1; // da 1 a 3 connessioni per ogni router
+        const potentialConnections = nodes
+            .filter(n => n.name !== node.name)
+            .map(n => {
+                const dx = node.routerElement.getBoundingClientRect().left - n.routerElement.getBoundingClientRect().left;
+                const dy = node.routerElement.getBoundingClientRect().top - n.routerElement.getBoundingClientRect().top;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                return { node: n, distance: distance };
+            })
+            .sort((a, b) => a.distance - b.distance); // ordina per distanza crescente
+
         for (let i = node.connections.length; i < numOfConn; i++) {
-            let dest = 0;
+            let destNode;
             do { // evita connessioni con se stesso e connessioni duplicate
-                dest = letters.filter(l => l != node.name)[Math.floor(Math.random() * (numberOfRouters - 1))];
-            } while (node.connections.find(c => c.to == dest) != undefined);
+                destNode = potentialConnections.shift().node;
+            } while (node.connections.find(c => c.to == destNode.name) != undefined);
+
             const distance = Math.floor(Math.random() * 13 + 2);
-            const destNode = nodes.find(n => n.name == dest);
-            node.connections.push(new Connection(dest, distance));
-            if (destNode) {
-                destNode.connections.push(new Connection(node.name, distance));
-            }
+            node.connections.push(new Connection(destNode.name, distance));
+            destNode.connections.push(new Connection(node.name, distance));
         }
     }
     console.log(nodes);
