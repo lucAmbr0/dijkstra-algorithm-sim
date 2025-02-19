@@ -109,6 +109,12 @@ body {
     box-shadow: 0 0 0 transparent;
 }
 
+.highlightedRouter {
+    background-color: rgb(149, 0, 0);
+    color: rgb(240,240,240);
+    scale: 1.2 !important;
+}
+
 #numberOfRouters {
     border-radius: 5px;
     border: solid 1px rgb(20, 20, 20);
@@ -128,6 +134,10 @@ body {
     z-index: 1;
     opacity: 0;
     animation: lineIn 0.2s 0.1s ease forwards;
+}
+
+.highlightedConnection {
+    background-color: rgb(187, 0, 0);
 }
 
 #settingsContainer {

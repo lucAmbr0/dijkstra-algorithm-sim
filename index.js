@@ -217,3 +217,29 @@ function updateDistancesTable() {
         }
     }
 }
+
+async function executeAlgorithm() {
+    for (node of nodes)
+        highlightNode(node);
+        await runAlgorithmOnNode(node);
+        noHighlightNode(node);
+}
+
+async function runAlgorithmOnNode(node) {
+        for (conn of node.connections) {
+            highlightConnection(conn);
+        }
+}
+
+function highlightNode(node) {
+    node.routerElement.classList.add("highlightedRouter");
+}
+function highlightConnection(connection) {
+    connection.linkElement.classList.add("highlightedConnection");
+}
+function NohighlightNode(node) {
+    node.routerElement.classList.remove("highlightedRouter");
+}
+function NohighlightConnection(connection) {
+    connection.linkElement.classList.remove("highlightedConnection");
+}
