@@ -153,6 +153,7 @@ function drawConnection(node1, node2) {
     const angle = Math.atan2(dy, dx) * (180 / Math.PI); // calcola l'angolo del collegamento in gradi
 
     const line = document.createElement("div"); // elemento linea
+    const lineDistance = document.createElement("p"); // elemento label
     line.classList.add("connectionLine");
     line.id = `line_${node1Element.id}_${node2Element.id}`;
     line.style.width = `${length}px`;
@@ -160,12 +161,26 @@ function drawConnection(node1, node2) {
     // gli estremi della linea terminano al centro dei router
     line.style.left = `${x1 - 50}px`;
     line.style.top = `${y1 - 25}px`;
+    lineDistance.classList.add("distanceLabel");
+    lineDistance.innerHTML = `${node1.connections.find(c => c.to == node2.name).distance}`;
+
+    // assegna l'elemento linea all'array di connessioni dei router
+    node1.connections.find(c => c.to == node2.name).linkElement = line;
+    node2.connections.find(c => c.to == node1.name).linkElement = line;
+
+     // Calcola la posizione della label al centro della linea
+    const midX = (x1 + x2 - 25) / 2;
+    const midY = (y1 + y2 - 12) / 2;
+    lineDistance.style.position = 'absolute';
+    lineDistance.style.left = `${midX - 25}px`; // Adjust for label width
+    lineDistance.style.top = `${midY - 12}px`; // Adjust for label height
 
     // assegna l'elemento linea all'array di connessioni dei router
     node1.connections.find(c => c.to == node2.name).linkElement = line;
     node2.connections.find(c => c.to == node1.name).linkElement = line;
 
     simContainer.appendChild(line);
+    simContainer.appendChild(lineDistance);
 }
 
 function generateDistancesTable() {
