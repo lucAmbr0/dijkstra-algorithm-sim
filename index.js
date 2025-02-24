@@ -12,7 +12,6 @@ class Node {
     }
     routerElement;
     connections = [];
-    distances = [];
 }
 
 let nodes = [];
@@ -183,21 +182,6 @@ function drawConnection(node1, node2) {
     simContainer.appendChild(lineDistance);
 }
 
-function generateDistancesTable() {
-    for (node of nodes) {
-        node.distances = [];
-        nodes.forEach(n => {
-            if (n.connections.find(c => c.to == node.name) != undefined) {
-                // per ogni nodo, se trova una connessione (diretta) esistente la ricopia nella tabella delle distanze
-                node.distances.push(n.connections.find(c => c.to == node.name));
-            } else {
-                // per tutti gli altri nodi aggiunge una distanza infinita provvisoria
-                node.distances.push(new Connection(n.name, Infinity));
-            }
-            });
-    }
-}
-
 function generateTableUI() {
     const table = document.getElementById("distancesTable");
     const x = nodes.length;
@@ -222,16 +206,6 @@ function generateTableUI() {
     // scrive le distanze nella tabella
     updateDistancesTable();
   }
-
-function updateDistancesTable() {
-    for (let i = 0; i < nodes.length; i++) {
-        for (let j = 0; j < nodes.length; j++) {
-            let cellContent = nodes[i].distances[j].distance;
-            cellContent = cellContent == Infinity ? "∞" : cellContent;
-            document.getElementById(`cell_${i + 1}_${j + 1}`).textContent = cellContent;
-        }
-    }
-}
 
 async function executeAlgorithm() {
     for (node of nodes)
