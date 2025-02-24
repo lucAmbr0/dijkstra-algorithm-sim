@@ -49,14 +49,13 @@ function generateGraph() {
 }
 
 function generateConnections() {
-    let availableNodes = nodes.filter(n => n.name != node.name);
     for (let node of nodes) {
-        for (n of availableNodes) {
+        let availableNodes = nodes.filter(n => n.name != node.name);
+        for (let n of availableNodes) {
             node.connections.push(new Connection(n.name, Infinity));
         }
     }
     chooseDirectConnections();
-    console.log(nodes);
 }
 
 function chooseDirectConnections() {
