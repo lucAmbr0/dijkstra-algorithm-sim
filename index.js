@@ -1,9 +1,9 @@
 class Connection {
-    constructor(to = "unknown connection", distance = -1, linkElement = "") {
+    constructor(to = "unknown connection", distance = -1) {
         this.to = to;
         this.distance = distance;
-        this.linkElement = linkElement;
     }
+    linkElement = null;
 }
 
 class Node {
@@ -12,6 +12,7 @@ class Node {
     }
     routerElement;
     connections = [];
+    coordinatesDistances = [];
 }
 
 let nodes = [];
@@ -40,7 +41,6 @@ function generateGraph() {
             generateRouterUI();
             generateConnections();
             generateConnectionsUI();
-            generateDistancesTable();
             generateTableUI();
         }
     } catch (e) {
@@ -49,30 +49,39 @@ function generateGraph() {
 }
 
 function generateConnections() {
+    let availableNodes = nodes.filter(n => n.name != node.name);
     for (let node of nodes) {
-        const numOfConn = Math.floor(Math.random() * 3) + 1; // da 1 a 3 connessioni per ogni router
-        const potentialConnections = nodes
-            .filter(n => n.name !== node.name)
-            .map(n => {
-                const dx = node.routerElement.getBoundingClientRect().left - n.routerElement.getBoundingClientRect().left;
-                const dy = node.routerElement.getBoundingClientRect().top - n.routerElement.getBoundingClientRect().top;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                return { node: n, distance: distance };
-            })
-            .sort((a, b) => a.distance - b.distance); // ordina per distanza crescente
-
-        for (let i = node.connections.length; i < numOfConn; i++) {
-            let destNode;
-            do { // evita connessioni con se stesso e connessioni duplicate
-                destNode = potentialConnections.shift().node;
-            } while (node.connections.find(c => c.to == destNode.name) != undefined);
-
-            const distance = Math.floor(Math.random() * 13 + 2);
-            node.connections.push(new Connection(destNode.name, distance));
-            destNode.connections.push(new Connection(node.name, distance));
+        for (n of availableNodes) {
+            node.connections.push(new Connection(n.name, Infinity));
         }
     }
+    chooseDirectConnections();
     console.log(nodes);
+}
+
+function chooseDirectConnections() {
+    for (let node of nodes) {
+        // riordina l'array delle distanze visuali tra il router corrente e
+        // gli altri router per prediligere connessioni con i router più vicini.
+        node.coordinatesDistances.sort((a, b) => a.distance - b.distance);
+        node.coordinatesDistances = node.coordinatesDistances.filter(c => c.to != node.name && c.distance != 0);
+        const rand = Math.random() * 3 + 1;
+        for (let i = 0; i < rand && node.connections.filter(n => n.distance != Infinity).length < rand; i++) {
+            let connectTo = node.coordinatesDistances[i];
+            if (!connectTo || !nodes.find(n => n.name == connectTo.to)) continue; // Ensure connectTo is defined and valid
+            try {
+                connectTo.distance = (Math.floor(connectTo.distance / 50));
+                let connection = node.connections.find(c => c.to == connectTo.to);
+                let reverseConnection = nodes.find(n => n.name == connectTo.to).connections.find(c => c.to == node.name);
+                if (connection && reverseConnection) {
+                    connection.distance = connectTo.distance;
+                    reverseConnection.distance = connectTo.distance;
+                }
+            } catch (e) {
+                console.error("ERRORE SU ROUTER " + node.name + "   " + connectTo.to);
+            }
+        }
+    }
 }
 
 function generateRouterUI() {
@@ -116,6 +125,14 @@ function generateRouterUI() {
             circle.style.top = `${y - radius}px`;
             simContainer.appendChild(circle);
         }
+
+    }
+    for (node of nodes) {
+        for (n of nodes) {
+            const XYdist = Math.sqrt(Math.pow(Math.abs(node.routerElement.getBoundingClientRect().left - n.routerElement.getBoundingClientRect().left), 2) + Math.pow(Math.abs(node.routerElement.getBoundingClientRect().top - n.routerElement.getBoundingClientRect().top), 2));
+            // XYdist misura la distanza visuale tra il router corrente e il router n
+            node.coordinatesDistances.push(new Connection(n.name, (Math.floor(XYdist))));
+        }
     }
 }
 
@@ -132,8 +149,9 @@ function generateConnectionsUI() {
 function drawConnection(node1, node2) {
     if (!node1 || !node2) return;
     // se esiste già un collegamento tra i due router, non crearne un altro
-    if (node1.connections.find(c => c.to == node2.name).linkElement) return;
-    if (node2.connections.find(c => c.to == node1.name).linkElement) return;
+    if (node1.connections.find(c => c.to == node2.name).linkElement != null) return;
+    if (node1.connections.find(c => c.to == node2.name).distance == Infinity) return;
+    if (node2.connections.find(c => c.to == node1.name).distance == Infinity) return;
 
     const node1Element = node1.routerElement;
     const node2Element = node2.routerElement;
@@ -167,7 +185,7 @@ function drawConnection(node1, node2) {
     node1.connections.find(c => c.to == node2.name).linkElement = line;
     node2.connections.find(c => c.to == node1.name).linkElement = line;
 
-     // Calcola la posizione della label al centro della linea
+    // Calcola la posizione della label al centro della linea
     const midX = (x1 + x2 - 25) / 2;
     const midY = (y1 + y2 - 12) / 2;
     lineDistance.style.position = 'absolute';
@@ -187,15 +205,15 @@ function generateTableUI() {
     const x = nodes.length;
     table.innerHTML = '';
     for (let row = 0; row < x + 1; row++) {
-      const tr = document.createElement('tr');
-      tr.id = `row_${row}`;
-      tr.classList.add('row');
-      for (let col = 0; col < x + 1; col++) {
-        const td = document.createElement('td'); // Create a new cell
-        td.id = `cell_${row}_${col}`;
-        tr.appendChild(td); // Append the cell to the row
-      }
-      table.appendChild(tr); // Append the row to the table
+        const tr = document.createElement('tr');
+        tr.id = `row_${row}`;
+        tr.classList.add('row');
+        for (let col = 0; col < x + 1; col++) {
+            const td = document.createElement('td'); // Create a new cell
+            td.id = `cell_${row}_${col}`;
+            tr.appendChild(td); // Append the cell to the row
+        }
+        table.appendChild(tr); // Append the row to the table
     }
     document.getElementById('cell_0_0').textContent = ''; // svuota l'angolo in alto a sinistra
     // scrive le intestazioni di righe e colonne
@@ -205,19 +223,28 @@ function generateTableUI() {
     }
     // scrive le distanze nella tabella
     updateDistancesTable();
-  }
+}
+
+function updateDistancesTable() {
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = 0; j < nodes.length; j++) {
+            const distance = nodes[i].connections.find(c => c.to == nodes[j].name).distance;
+            document.getElementById(`cell_${i + 1}_${j + 1}`).textContent = distance == Infinity ? '∞' : distance;
+        }
+    }
+}
 
 async function executeAlgorithm() {
     for (node of nodes)
         highlightNode(node);
-        await runAlgorithmOnNode(node);
-        noHighlightNode(node);
+    await runAlgorithmOnNode(node);
+    noHighlightNode(node);
 }
 
 async function runAlgorithmOnNode(node) {
-        for (conn of node.connections) {
-            highlightConnection(conn);
-        }
+    for (conn of node.connections) {
+        highlightConnection(conn);
+    }
 }
 
 function highlightNode(node) {
