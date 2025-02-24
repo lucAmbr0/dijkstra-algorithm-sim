@@ -172,8 +172,8 @@ function drawConnection(node1, node2) {
     const midX = (x1 + x2 - 25) / 2;
     const midY = (y1 + y2 - 12) / 2;
     lineDistance.style.position = 'absolute';
-    lineDistance.style.left = `${midX - 25}px`; // Adjust for label width
-    lineDistance.style.top = `${midY - 12}px`; // Adjust for label height
+    lineDistance.style.left = `calc(${midX - 25}px - 2.5vw)`; // Adjust for label width
+    lineDistance.style.top = `calc(${midY - 12}px - 2.5vh)`; // Adjust for label height
 
     // assegna l'elemento linea all'array di connessioni dei router
     node1.connections.find(c => c.to == node2.name).linkElement = line;
