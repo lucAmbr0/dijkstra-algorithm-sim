@@ -50,8 +50,7 @@ function generateGraph() {
 
 function generateConnections() {
     for (let node of nodes) {
-        let availableNodes = nodes.filter(n => n.name != node.name);
-        for (let n of availableNodes) {
+        for (let n of nodes) {
             node.connections.push(new Connection(n.name, Infinity));
         }
     }
@@ -64,7 +63,7 @@ function chooseDirectConnections() {
         // gli altri router per prediligere connessioni con i router più vicini.
         node.coordinatesDistances.sort((a, b) => a.distance - b.distance);
         node.coordinatesDistances = node.coordinatesDistances.filter(c => c.to != node.name && c.distance != 0);
-        const rand = Math.random() * 3 + 1;
+        const rand = Math.random() * 2 + 1;
         for (let i = 0; i < rand && node.connections.filter(n => n.distance != Infinity).length < rand; i++) {
             let connectTo = node.coordinatesDistances[i];
             if (!connectTo || !nodes.find(n => n.name == connectTo.to)) continue; // Ensure connectTo is defined and valid
@@ -133,6 +132,9 @@ function generateRouterUI() {
             node.coordinatesDistances.push(new Connection(n.name, (Math.floor(XYdist))));
         }
     }
+    for (node of nodes) {
+        makeNodeDraggable(node);
+    }
 }
 
 function generateConnectionsUI() {
@@ -171,6 +173,7 @@ function drawConnection(node1, node2) {
     const line = document.createElement("div"); // elemento linea
     const lineDistance = document.createElement("p"); // elemento label
     line.classList.add("connectionLine");
+    lineDistance.classList.add(`label_${node1Element.id}_${node2Element.id}`);
     line.id = `line_${node1Element.id}_${node2Element.id}`;
     line.style.width = `${length}px`;
     line.style.transform = `rotate(${angle}deg)`;
@@ -227,8 +230,12 @@ function generateTableUI() {
 function updateDistancesTable() {
     for (let i = 0; i < nodes.length; i++) {
         for (let j = 0; j < nodes.length; j++) {
-            const distance = nodes[i].connections.find(c => c.to == nodes[j].name).distance;
-            document.getElementById(`cell_${i + 1}_${j + 1}`).textContent = distance == Infinity ? '∞' : distance;
+            try {
+                const distance = nodes[i].connections.find(c => c.to == nodes[j].name).distance;
+                document.getElementById(`cell_${i + 1}_${j + 1}`).textContent = distance == Infinity ? '∞' : distance;
+            } catch {
+                console.log("ERRORE SU " + nodes[i].name + " " + nodes[j].name);
+            }
         }
     }
 }
@@ -257,4 +264,59 @@ function NohighlightNode(node) {
 }
 function NohighlightConnection(connection) {
     connection.linkElement.classList.remove("highlightedConnection");
+}
+
+function makeNodeDraggable(node) {
+    let offsetX, offsetY;
+    let isDragging = false;
+
+    node.routerElement.addEventListener('mousedown', (e) => {
+        offsetX = e.clientX - node.routerElement.getBoundingClientRect().left;
+        offsetY = e.clientY - node.routerElement.getBoundingClientRect().top;
+        isDragging = true;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        // Remove existing connection lines and distance labels
+        for (let conn of node.connections) {
+            if (conn.linkElement) {
+                conn.linkElement.remove();
+                conn.linkElement = null;
+            }
+            const label = document.querySelector(`.label_${node.routerElement.id}_${nodes.find(n => n.name == conn.to).routerElement.id}`);
+            if (label) {
+                label.remove();
+            }
+        }
+        // Remove reverse connections and labels
+        for (let otherNode of nodes) {
+            if (otherNode === node) continue;
+            const reverseConn = otherNode.connections.find(c => c.to === node.name);
+            if (reverseConn && reverseConn.linkElement) {
+                reverseConn.linkElement.remove();
+                reverseConn.linkElement = null;
+            }
+            const reverseLabel = document.querySelector(`.label_${otherNode.routerElement.id}_${node.routerElement.id}`);
+            if (reverseLabel) {
+                reverseLabel.remove();
+            }
+        }
+    });
+
+    function onMouseMove(e) {
+        if (!isDragging) return;
+        node.routerElement.style.left = `${e.clientX - offsetX}px`;
+        node.routerElement.style.top = `${e.clientY - offsetY}px`;
+    }
+
+    function onMouseUp() {
+        if (!isDragging) return;
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        generateConnectionsUI();
+    }
+}
+
+function updateConnections(node) {
+    
 }

@@ -93,10 +93,13 @@ body {
     border-radius: 50%;
     background-color: rgb(255, 255, 255);
     z-index: 2;
-    cursor: pointer;
+    cursor: grab;
     opacity: 0;
     animation: routerIn 0.4s ease forwards;
     transition: 0.2s ease all;
+    ::selection {
+        background-color: transparent;
+    }
 }
 
 .routerElement:hover {
