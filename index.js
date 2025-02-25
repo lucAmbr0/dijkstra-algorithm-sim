@@ -240,6 +240,15 @@ function updateDistancesTable() {
     }
 }
 
+function toggleHighlightRow(node, defined) {
+    const row = document.getElementById(`row_${nodes.findIndex(n => n.name == node.name) + 1}`);
+    if (defined !== undefined) {
+        row.classList.toggle("highlightedRow", defined);
+    } else {
+        row.classList.toggle("highlightedRow");
+    }
+}
+
 async function executeAlgorithm() {
     for (node of nodes)
         highlightNode(node);
@@ -270,12 +279,21 @@ function makeNodeDraggable(node) {
     let offsetX, offsetY;
     let isDragging = false;
 
+    node.routerElement.addEventListener("mouseover", () => {
+        toggleHighlightRow(node, true);
+    });
+
+    node.routerElement.addEventListener("mouseout", () => { 
+        toggleHighlightRow(node, false);
+    });
+
     node.routerElement.addEventListener('mousedown', (e) => {
         offsetX = e.clientX - node.routerElement.getBoundingClientRect().left;
         offsetY = e.clientY - node.routerElement.getBoundingClientRect().top;
         isDragging = true;
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
+
         // Remove existing connection lines and distance labels
         for (let conn of node.connections) {
             if (conn.linkElement) {
@@ -315,8 +333,4 @@ function makeNodeDraggable(node) {
         document.removeEventListener('mouseup', onMouseUp);
         generateConnectionsUI();
     }
-}
-
-function updateConnections(node) {
-    
 }
