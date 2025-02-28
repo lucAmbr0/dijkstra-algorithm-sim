@@ -250,29 +250,63 @@ function toggleHighlightRow(node, defined) {
 }
 
 async function executeAlgorithm() {
-    for (node of nodes)
-        highlightNode(node);
-    await runAlgorithmOnNode(node);
-    noHighlightNode(node);
-}
-
-async function runAlgorithmOnNode(node) {
-    for (conn of node.connections) {
-        highlightConnection(conn);
+    for (node of nodes) {
+        await highlightNode(node);
+        await runAlgorithmOnNode(node);
+        await noHighlightNode(node);
     }
 }
 
-function highlightNode(node) {
-    node.routerElement.classList.add("highlightedRouter");
+async function runAlgorithmOnNode(node) {
+    let nodesToVisit = new MinHeap();
+    // node.connections.forEach(c => {
+    //     nodesToVisit.insert({ name: c.to, distance: c.distance });
+    // });
+    let conns = [];
+    node.connections.forEach(c => {
+        if (c.distance != Infinity) {
+            let n = nodes.find(n => n.name == c.to);
+            conns.push({ n, distance: c.distance });
+        }
+    });
+    nodesToVisit.heapify(conns);
+    console.log(nodesToVisit);
+    while (!nodesToVisit.isEmpty()) {
+        let current = nodesToVisit.extractMin();
+        let currentNode = nodes.find(n => n.name == current.name);
+        
+    }
+    for (conn of node.connections) {
+        await highlightConnection(conn);
+    }
+    for (conn of node.connections) {
+        noHighlightConnection(conn);
+    }
 }
-function highlightConnection(connection) {
-    connection.linkElement.classList.add("highlightedConnection");
+
+async function highlightNode(node) {
+    if (node.routerElement) {
+        await new Promise(r => setTimeout(r, 500));
+        node.routerElement.classList.add("highlightedRouter");
+    }
 }
-function NohighlightNode(node) {
-    node.routerElement.classList.remove("highlightedRouter");
+async function highlightConnection(connection) {
+    if (connection.linkElement) {
+        await new Promise(r => setTimeout(r, 500));
+        connection.linkElement.classList.add("highlightedConnection");
+    }
 }
-function NohighlightConnection(connection) {
-    connection.linkElement.classList.remove("highlightedConnection");
+async function noHighlightNode(node) {
+    if (node.routerElement) {
+        await new Promise(r => setTimeout(r, 500));
+        node.routerElement.classList.remove("highlightedRouter");
+    }
+}
+async function noHighlightConnection(connection) {
+    if (connection.linkElement) {
+        await new Promise(r => setTimeout(r, 500));
+        connection.linkElement.classList.remove("highlightedConnection");
+    }
 }
 
 function makeNodeDraggable(node) {
@@ -283,7 +317,7 @@ function makeNodeDraggable(node) {
         toggleHighlightRow(node, true);
     });
 
-    node.routerElement.addEventListener("mouseout", () => { 
+    node.routerElement.addEventListener("mouseout", () => {
         toggleHighlightRow(node, false);
     });
 
