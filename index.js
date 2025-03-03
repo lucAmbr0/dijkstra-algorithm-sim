@@ -258,36 +258,56 @@ async function executeAlgorithm() {
 }
 
 async function runAlgorithmOnNode(node) {
+    await highlightNode(node);
     let nodesToVisit = new MinHeap();
     // node.connections.forEach(c => {
     //     nodesToVisit.insert({ name: c.to, distance: c.distance });
     // });
     let conns = [];
+    let foundConnections = [];
     node.connections.forEach(c => {
         if (c.distance != Infinity) {
             let n = nodes.find(n => n.name == c.to);
-            conns.push({ n, distance: c.distance });
+            conns.push({ node: n, distance: c.distance });
         }
     });
     nodesToVisit.heapify(conns);
     console.log(nodesToVisit);
     while (!nodesToVisit.isEmpty()) {
+        // estrae il nodo con distanza più vicina
         let current = nodesToVisit.extractMin();
-        let currentNode = nodes.find(n => n.name == current.name);
-        
+        await highlightNode(current, 2);
+        // filtra dalle connessioni non infinite (tiene solo quelle con i nodi direttamente collegati)
+        current.node.connections.filter(dc => dc.distance != Infinity && dc.to != node.name).forEach(dc => {
+            // aggiunge le connessioni trovate
+            foundConnections.push(dc);
+            const newDist = current.distance + dc.distance
+            if (newDist < node.connections.find(c => c.to == dc.to).distance)
+                node.connections.find(c => c.to == dc.to).distance = (newDist);
+            updateDistancesTable();
+        });
+        await noHighlightNode(current);
     }
-    for (conn of node.connections) {
-        await highlightConnection(conn);
-    }
-    for (conn of node.connections) {
-        noHighlightConnection(conn);
-    }
+    // for (conn of node.connections) {
+    //     await highlightConnection(c);
+    // }
+    // for (conn of node.connections) {
+    //     noHighlightConnection(conn);
+    // }
 }
 
-async function highlightNode(node) {
+async function highlightNode(node, priority = 1) {
     if (node.routerElement) {
         await new Promise(r => setTimeout(r, 500));
-        node.routerElement.classList.add("highlightedRouter");
+        switch (priority) {
+            case 1:
+                node.routerElement.classList.add("highlightedRouter");
+                break;
+            case 2:
+                node.routerElement.classList.add("lightHighlightRouter");
+            default:
+                break;
+        }
     }
 }
 async function highlightConnection(connection) {
@@ -299,7 +319,7 @@ async function highlightConnection(connection) {
 async function noHighlightNode(node) {
     if (node.routerElement) {
         await new Promise(r => setTimeout(r, 500));
-        node.routerElement.classList.remove("highlightedRouter");
+        node.routerElement.classList = "routerElement";
     }
 }
 async function noHighlightConnection(connection) {
