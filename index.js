@@ -258,8 +258,8 @@ function toggleHighlightRow(node, defined) {
 
 async function executeAlgorithm() {
     for (node of nodes) {
+        log("##### Evaluated router " + node.name);
         await runAlgorithmOnNode(node);
-        log("###+ Evaluated router " + node.name);
         nodes.forEach(n => {
             n.connections.forEach(async c => noHighlightConnection(c));
         })
@@ -289,6 +289,7 @@ async function runAlgorithmOnNode(node) {
                 let newDist = currentDistance + conn.distance;
 
                 if (newDist < distances[neighborNode.name]) {
+                    log(`Found shorter path to ${neighborNode.name} through ${currentNode.name}`);
                     distances[neighborNode.name] = newDist;
                     previousNodes[neighborNode.name] = currentNode.name;
                     nodesToVisit.insert({ node: neighborNode, distance: newDist });
@@ -296,6 +297,8 @@ async function runAlgorithmOnNode(node) {
 
                 if (neighborNode !== node)
                     await highlightNode(neighborNode, 2);
+                log(`Evaluating connection ${currentNode.name} -> ${neighborNode.name} with distance ${newDist}`);
+                
                 await highlightConnection(conn);
                 await noHighlightNode(neighborNode);
             }
