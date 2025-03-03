@@ -205,10 +205,21 @@ body {
     flex-direction: column;
 }
 
-#generateSettings {
+.generateSettings {
     display: flex;
+    padding: 5px;
     justify-content: space-between;
     align-items: center;
+}
+
+.generateSettings div {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+}
+
+.generateSettings div label {
+    margin-bottom: 5px;
 }
 
 #executionButtonsContainer {

@@ -18,7 +18,7 @@ class Node {
 let nodes = [];
 let numberOfRouters = 0;
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"];
-
+let animationSpeed = 1;
 
 generateGraph();
 function generateGraph() {
@@ -323,6 +323,12 @@ async function highlightNode(node, priority) {
     }
 }
 
+changeSpeed(); // imposta la velocità iniziale
+function changeSpeed() {
+    const speedSlider = document.getElementById("animationSpeed");
+    animationSpeed = 5000 - (speedSlider.value - 1) * 45;
+}
+
 async function delay(ms) {
     await new Promise(r => setTimeout(r, ms));
 }
@@ -333,13 +339,13 @@ async function highlightConnection(connection) {
 }
 async function noHighlightNode(node) {
     if (node.routerElement) {
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, animationSpeed));
         node.routerElement.classList = "routerElement";
     }
 }
 async function noHighlightConnection(connection) {
     if (connection.linkElement) {
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, animationSpeed));
         connection.linkElement.classList.remove("highlightedConnection");
     }
 }

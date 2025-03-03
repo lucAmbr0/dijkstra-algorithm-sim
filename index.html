@@ -8,12 +8,16 @@
             <div id="simContainer"></div>
             <div id="settingsContainer">
                 <h1 id="title">Dijkstra Algorithm Simulator</h1>
-                <div id="generateSettings">
+                <div class="generateSettings">
                     <div>
                         <label for="numberOfRouters">Routers: </label>
                         <input id="numberOfRouters" type="number" min="5" max="15" value="5">
                     </div>
-                    <button class="generateButton" onclick="generateGraph()">Generate graph</button>
+                    <div>
+                        <label for="animationSpeed">Speed: </label>
+                        <input type="range" id="animationSpeed" min="1" max="100" value="50" onchange="changeSpeed()">
+                    </div>
+                    <button class="generateButton" onclick="generateGraph()">Generate Graph</button>
                 </div>
                 <div id="executionButtonsContainer">
                     <button class="executeBtn" onclick="executeAlgorithm()">Run algorithm</button>
