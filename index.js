@@ -252,6 +252,9 @@ function toggleHighlightRow(node, defined) {
 async function executeAlgorithm() {
     for (node of nodes) {
         await runAlgorithmOnNode(node);
+        nodes.forEach(n => {
+            n.connections.forEach(async c => noHighlightConnection(c));
+        })
     }
 }
 
@@ -271,29 +274,27 @@ async function runAlgorithmOnNode(node) {
 
     while (!nodesToVisit.isEmpty()) {
         let { node: currentNode, distance: currentDistance } = nodesToVisit.extractMin();
-        
-        currentNode.connections.forEach(async conn => {
+
+        for (let conn of currentNode.connections) {
             if (conn.distance != Infinity) {
-                if (currentNode.name != node.name) {
-                    await highlightNode(currentNode, 2);
-                }
-                highlightConnection(conn)
                 let neighborNode = nodes.find(n => n.name == conn.to);
                 let newDist = currentDistance + conn.distance;
-                
+
                 if (newDist < distances[neighborNode.name]) {
                     distances[neighborNode.name] = newDist;
                     previousNodes[neighborNode.name] = currentNode.name;
                     nodesToVisit.insert({ node: neighborNode, distance: newDist });
                 }
-                await noHighlightConnection(conn);
+
+                if (neighborNode !== node)
+                    await highlightNode(neighborNode, 2);
+                await highlightConnection(conn);
+                await noHighlightNode(neighborNode);
             }
-        });
-        if (currentNode.name != node.name)
-            await noHighlightNode(currentNode);
+        }
     }
 
-    await noHighlightNode(node)
+    await noHighlightNode(node);
 
     // Update the distances in the original node connections
     for (let [nodeName, distance] of Object.entries(distances)) {
@@ -306,6 +307,20 @@ async function runAlgorithmOnNode(node) {
     }
 
     updateDistancesTable();
+}
+
+function clearLog() {
+    document.getElementById("logs").innerHTML = "";
+}
+
+log("logs will appear here");
+function log(message) {
+    const logContainer = document.getElementById("logs");
+    const logText = document.createElement("p");
+    logText.textContent = message;
+    logContainer.appendChild(logText);
+    logContainer.appendChild(document.createElement("br"));
+    logContainer.scrollTop = logContainer.scrollHeight;
 }
 
 async function highlightNode(node, priority) {
