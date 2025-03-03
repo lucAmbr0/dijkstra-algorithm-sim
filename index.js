@@ -251,68 +251,83 @@ function toggleHighlightRow(node, defined) {
 
 async function executeAlgorithm() {
     for (node of nodes) {
-        await highlightNode(node);
         await runAlgorithmOnNode(node);
-        await noHighlightNode(node);
     }
 }
 
 async function runAlgorithmOnNode(node) {
-    await highlightNode(node);
+    let distances = {};
+    let previousNodes = {};
     let nodesToVisit = new MinHeap();
-    // node.connections.forEach(c => {
-    //     nodesToVisit.insert({ name: c.to, distance: c.distance });
-    // });
-    let conns = [];
-    let foundConnections = [];
-    node.connections.forEach(c => {
-        if (c.distance != Infinity) {
-            let n = nodes.find(n => n.name == c.to);
-            conns.push({ node: n, distance: c.distance });
-        }
+
+    nodes.forEach(n => {
+        distances[n.name] = Infinity;
+        previousNodes[n.name] = null;
     });
-    nodesToVisit.heapify(conns);
-    console.log(nodesToVisit);
+    await highlightNode(node, 1);
+
+    distances[node.name] = 0;
+    nodesToVisit.insert({ node: node, distance: 0 });
+
     while (!nodesToVisit.isEmpty()) {
-        // estrae il nodo con distanza più vicina
-        let current = nodesToVisit.extractMin();
-        await highlightNode(current, 2);
-        // filtra dalle connessioni non infinite (tiene solo quelle con i nodi direttamente collegati)
-        current.node.connections.filter(dc => dc.distance != Infinity && dc.to != node.name).forEach(dc => {
-            // aggiunge le connessioni trovate
-            foundConnections.push(dc);
-            const newDist = current.distance + dc.distance
-            if (newDist < node.connections.find(c => c.to == dc.to).distance)
-                node.connections.find(c => c.to == dc.to).distance = (newDist);
-            updateDistancesTable();
+        let { node: currentNode, distance: currentDistance } = nodesToVisit.extractMin();
+        
+        currentNode.connections.forEach(async conn => {
+            if (conn.distance != Infinity) {
+                if (currentNode.name != node.name) {
+                    await highlightNode(currentNode, 2);
+                }
+                highlightConnection(conn)
+                let neighborNode = nodes.find(n => n.name == conn.to);
+                let newDist = currentDistance + conn.distance;
+                
+                if (newDist < distances[neighborNode.name]) {
+                    distances[neighborNode.name] = newDist;
+                    previousNodes[neighborNode.name] = currentNode.name;
+                    nodesToVisit.insert({ node: neighborNode, distance: newDist });
+                }
+                await noHighlightConnection(conn);
+            }
         });
-        await noHighlightNode(current);
+        if (currentNode.name != node.name)
+            await noHighlightNode(currentNode);
     }
-    // for (conn of node.connections) {
-    //     await highlightConnection(c);
-    // }
-    // for (conn of node.connections) {
-    //     noHighlightConnection(conn);
-    // }
+
+    await noHighlightNode(node)
+
+    // Update the distances in the original node connections
+    for (let [nodeName, distance] of Object.entries(distances)) {
+        if (nodeName !== node.name) {
+            let connection = node.connections.find(c => c.to == nodeName);
+            if (connection) {
+                connection.distance = distance;
+            }
+        }
+    }
+
+    updateDistancesTable();
 }
 
-async function highlightNode(node, priority = 1) {
+async function highlightNode(node, priority) {
     if (node.routerElement) {
-        await new Promise(r => setTimeout(r, 500));
         switch (priority) {
             case 1:
                 node.routerElement.classList.add("highlightedRouter");
                 break;
             case 2:
-                node.routerElement.classList.add("lightHighlightRouter");
+                node.routerElement.classList.add("lightHighlightedRouter");
+                break;
             default:
                 break;
         }
     }
 }
+
+async function delay(ms) {
+    await new Promise(r => setTimeout(r, ms));
+}
 async function highlightConnection(connection) {
     if (connection.linkElement) {
-        await new Promise(r => setTimeout(r, 500));
         connection.linkElement.classList.add("highlightedConnection");
     }
 }
