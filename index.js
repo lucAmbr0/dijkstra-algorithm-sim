@@ -18,11 +18,14 @@ class Node {
 let nodes = [];
 let numberOfRouters = 0;
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"];
-let animationSpeed = 1;
+let animationSpeed = 50;
+let logs = 0;
 
 generateGraph();
 function generateGraph() {
     try {
+        clearLog();
+        log("New graph created");
         numberOfRouters = document.getElementById("numberOfRouters").value;
         if (numberOfRouters >= 5 && numberOfRouters <= 15) {
             nodes = [];
@@ -256,6 +259,7 @@ function toggleHighlightRow(node, defined) {
 async function executeAlgorithm() {
     for (node of nodes) {
         await runAlgorithmOnNode(node);
+        log("###+ Evaluated router " + node.name);
         nodes.forEach(n => {
             n.connections.forEach(async c => noHighlightConnection(c));
         })
@@ -320,7 +324,8 @@ function clearLog() {
 function log(message) {
     const logContainer = document.getElementById("logs");
     const logText = document.createElement("p");
-    logText.textContent = message;
+    logs++;
+    logText.textContent = logs + ": " + message;
     logContainer.appendChild(logText);
     logContainer.scrollTop = logContainer.scrollHeight;
 }
