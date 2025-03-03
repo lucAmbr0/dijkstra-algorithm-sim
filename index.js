@@ -38,10 +38,14 @@ function generateGraph() {
                     `<p class="routerLabel" id="${routerLabel}">${letters[i]}</p>`;
                 // console.log(nodes[i].routerElement);
             }
+            log(`Generated ${numberOfRouters} routers`);
             generateRouterUI();
             generateConnections();
+            log("Generated random router connections");
             generateConnectionsUI();
+            log("Generated simulation UI");
             generateTableUI();
+            log("Generated distances table");
         }
     } catch (e) {
         console.error(e);
@@ -313,13 +317,11 @@ function clearLog() {
     document.getElementById("logs").innerHTML = "";
 }
 
-log("logs will appear here");
 function log(message) {
     const logContainer = document.getElementById("logs");
     const logText = document.createElement("p");
     logText.textContent = message;
     logContainer.appendChild(logText);
-    logContainer.appendChild(document.createElement("br"));
     logContainer.scrollTop = logContainer.scrollHeight;
 }
 
@@ -342,6 +344,7 @@ changeSpeed(); // imposta la velocità iniziale
 function changeSpeed() {
     const speedSlider = document.getElementById("animationSpeed");
     animationSpeed = 5000 - (speedSlider.value - 1) * 45;
+    log(`Animation speed set to ${animationSpeed}ms`);
 }
 
 async function delay(ms) {
