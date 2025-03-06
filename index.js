@@ -13,6 +13,7 @@ class Node {
     routerElement;
     connections = [];
     coordinatesDistances = [];
+    finished = false;
 }
 
 let nodes = [];
@@ -258,8 +259,9 @@ function toggleHighlightRow(node, defined) {
 
 async function executeAlgorithm() {
     for (node of nodes) {
-        log("##### Evaluated router " + node.name);
+        log("##### Evaluated router: " + node.name);
         await runAlgorithmOnNode(node);
+        await noHighlightNode(node);
         nodes.forEach(n => {
             n.connections.forEach(async c => noHighlightConnection(c));
         })
@@ -274,6 +276,7 @@ async function runAlgorithmOnNode(node) {
     nodes.forEach(n => {
         distances[n.name] = Infinity;
         previousNodes[n.name] = null;
+        n.finished = false;
     });
     await highlightNode(node, 1);
 
@@ -295,17 +298,24 @@ async function runAlgorithmOnNode(node) {
                     nodesToVisit.insert({ node: neighborNode, distance: newDist });
                 }
 
+                log(`Evaluating connection ${currentNode.name} -> ${neighborNode.name} with distance ${newDist}`);
                 if (neighborNode !== node)
                     await highlightNode(neighborNode, 2);
-                log(`Evaluating connection ${currentNode.name} -> ${neighborNode.name} with distance ${newDist}`);
-                
+                else highlightNode(neighborNode, 1);
+                if (currentNode !== node)
+                    await highlightNode(currentNode, 2);
+                else highlightNode(currentNode, 1);
                 await highlightConnection(conn);
-                await noHighlightNode(neighborNode);
+                if (neighborNode !== node)
+                    await noHighlightNode(neighborNode);
+                updateDistancesTable();
             }
         }
+        nodes.forEach(n => {
+            if (n != node)
+                noHighlightNode(n);
+        });
     }
-
-    await noHighlightNode(node);
 
     // Update the distances in the original node connections
     for (let [nodeName, distance] of Object.entries(distances)) {
@@ -317,7 +327,6 @@ async function runAlgorithmOnNode(node) {
         }
     }
 
-    updateDistancesTable();
 }
 
 function clearLog() {
