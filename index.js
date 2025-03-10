@@ -260,61 +260,61 @@ function toggleHighlightRow(node, defined) {
 async function executeAlgorithm() {
     for (node of nodes) {
         log("##### Evaluated router: " + node.name);
-        await runAlgorithmOnNode(node);
-        await noHighlightNode(node);
         nodes.forEach(n => {
-            n.connections.forEach(async c => noHighlightConnection(c));
-        })
+            n.connections.forEach(c => noHighlightConnection(c))
+            if (n.name !== node.name)
+                noHighlightNode(n);
+        });
+        highlightNode(node, 1);
+        await delay(animationSpeed);
+        await runAlgorithmOnNode(node);
     }
 }
 
 async function runAlgorithmOnNode(node) {
+
     let distances = {};
     let previousNodes = {};
     let nodesToVisit = new MinHeap();
+
+    node.connections.find(d => d.to == node.name).distance = 0;
 
     nodes.forEach(n => {
         distances[n.name] = Infinity;
         previousNodes[n.name] = null;
         n.finished = false;
     });
-    await highlightNode(node, 1);
 
     distances[node.name] = 0;
     nodesToVisit.insert({ node: node, distance: 0 });
-
     while (!nodesToVisit.isEmpty()) {
         let { node: currentNode, distance: currentDistance } = nodesToVisit.extractMin();
-
         for (let conn of currentNode.connections) {
             if (conn.distance != Infinity) {
                 let neighborNode = nodes.find(n => n.name == conn.to);
-                let newDist = currentDistance + conn.distance;
-
-                if (newDist < distances[neighborNode.name]) {
-                    log(`Found shorter path to ${neighborNode.name} through ${currentNode.name}`);
-                    distances[neighborNode.name] = newDist;
-                    previousNodes[neighborNode.name] = currentNode.name;
-                    nodesToVisit.insert({ node: neighborNode, distance: newDist });
+                if (neighborNode != node) {
+                    let newDist = currentDistance + conn.distance;
+                    log(`Evaluating connection ${node.name} -> ${currentNode.name} -> ${neighborNode.name} with distance ${newDist}`);
+                    if (newDist < distances[neighborNode.name]) {
+                        highlightConnection(conn);
+                        await delay(animationSpeed / 20);
+                        log(`Found shorter path to ${neighborNode.name} through ${currentNode.name}`);
+                        if (neighborNode.name != node.name) {
+                            highlightNode(neighborNode, 2);
+                            await delay(animationSpeed);
+                        }
+                        if (currentNode.name !== node.name) {
+                            highlightNode(currentNode, 2);
+                            await delay(animationSpeed);
+                        }
+                        distances[neighborNode.name] = newDist;
+                        previousNodes[neighborNode.name] = currentNode.name;
+                        nodesToVisit.insert({ node: neighborNode, distance: newDist });
+                    }
                 }
-
-                log(`Evaluating connection ${currentNode.name} -> ${neighborNode.name} with distance ${newDist}`);
-                if (neighborNode !== node)
-                    await highlightNode(neighborNode, 2);
-                else highlightNode(neighborNode, 1);
-                if (currentNode !== node)
-                    await highlightNode(currentNode, 2);
-                else highlightNode(currentNode, 1);
-                await highlightConnection(conn);
-                if (neighborNode !== node)
-                    await noHighlightNode(neighborNode);
                 updateDistancesTable();
             }
         }
-        nodes.forEach(n => {
-            if (n != node)
-                noHighlightNode(n);
-        });
     }
 
     // Update the distances in the original node connections
@@ -342,7 +342,7 @@ function log(message) {
     logContainer.scrollTop = logContainer.scrollHeight;
 }
 
-async function highlightNode(node, priority) {
+function highlightNode(node, priority) {
     if (node.routerElement) {
         switch (priority) {
             case 1:
@@ -367,20 +367,18 @@ function changeSpeed() {
 async function delay(ms) {
     await new Promise(r => setTimeout(r, ms));
 }
-async function highlightConnection(connection) {
+function highlightConnection(connection) {
     if (connection.linkElement) {
         connection.linkElement.classList.add("highlightedConnection");
     }
 }
-async function noHighlightNode(node) {
+function noHighlightNode(node) {
     if (node.routerElement) {
-        await new Promise(r => setTimeout(r, animationSpeed));
         node.routerElement.classList = "routerElement";
     }
 }
-async function noHighlightConnection(connection) {
+function noHighlightConnection(connection) {
     if (connection.linkElement) {
-        await new Promise(r => setTimeout(r, animationSpeed));
         connection.linkElement.classList.remove("highlightedConnection");
     }
 }
