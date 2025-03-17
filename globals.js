@@ -16,8 +16,15 @@ class Node {
     finished = false;
 }
 
-let nodes = [];
-let numberOfRouters = 0;
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"];
-let animationSpeed = 50;
-let logs = 0;
+let nodes;
+let numberOfRouters;
+let animationSpeed;
+let logs;
+
+function assignGlobals() {
+    nodes = [];
+    numberOfRouters = 0;
+    animationSpeed = 50;
+    logs = 0;
+}

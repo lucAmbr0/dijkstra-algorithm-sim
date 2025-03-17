@@ -6,7 +6,7 @@
 * Worked on this project for: <a href="https://wakatime.com/badge/github/lucAmbr0/dijkstra-algorithm-sim"><img src="https://wakatime.com/badge/github/lucAmbr0/dijkstra-algorithm-sim.svg?style=flat" alt="wakatime"></a>
 
 # Introduction
-> This project is in early stage, many things may change often.
+> This project is flagged as finished.
 
 * **Dijkstra Algorithm Simulator** is a web application designed to visually and technically demonstrate how Dijkstra’s algorithm calculates the shortest paths in a weighted graph. This simulation provides an interactive way to understand the inner workings of one of the most fundamental algorithms used in network routing and graph theory.
 
@@ -47,9 +47,14 @@ There are no strict requirements, but for an optimal experience:
 ```
 dijkstra-algorithm-sim
 │
-│  index.html
-|  style.css
+|  globals.js
+|  index.html
 |  index.js
+|  LICENSE
+|  minHeap.js
+|  README.md
+|  style.css
+|  UIchanges.js
 ├───
 ```
 

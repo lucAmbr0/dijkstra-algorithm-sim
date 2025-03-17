@@ -1,3 +1,5 @@
+assignGlobals();
+changeSpeed(); // imposta la velocità iniziale
 generateGraph();
 function generateGraph() {
     try {
@@ -79,6 +81,11 @@ async function executeAlgorithm() {
         await runAlgorithmOnNode(node);
         updateDistancesTable();
     }
+    nodes.forEach(n => {
+        n.connections.forEach(c => noHighlightConnection(c))
+        if (n.name !== node.name)
+            noHighlightNode(n);
+    });
     updateDistancesTable();
 }
 
@@ -100,6 +107,11 @@ async function runAlgorithmOnNode(node) {
     nodesToVisit.insert({ node: node, distance: 0 });
     while (!nodesToVisit.isEmpty()) {
         let { node: currentNode, distance: currentDistance } = nodesToVisit.extractMin();
+        console.log(currentNode.connections);
+        currentNode.connections.sort((a, b) => {
+            return 0;
+          });
+        console.log(currentNode.connections);
         for (let conn of currentNode.connections) {
             if (conn.distance != Infinity) {
                 let neighborNode = nodes.find(n => n.name == conn.to);
@@ -110,6 +122,7 @@ async function runAlgorithmOnNode(node) {
                         highlightConnection(conn);
                         await delay(animationSpeed / 20);
                         log(`Found shorter path to ${neighborNode.name} through ${currentNode.name}`);
+                        updateDistancesTable();
                         if (neighborNode.name != node.name) {
                             highlightNode(neighborNode, 2);
                             await delay(animationSpeed);
