@@ -268,7 +268,9 @@ async function executeAlgorithm() {
         highlightNode(node, 1);
         await delay(animationSpeed);
         await runAlgorithmOnNode(node);
+        updateDistancesTable();
     }
+    updateDistancesTable();
 }
 
 async function runAlgorithmOnNode(node) {
@@ -312,7 +314,6 @@ async function runAlgorithmOnNode(node) {
                         nodesToVisit.insert({ node: neighborNode, distance: newDist });
                     }
                 }
-                updateDistancesTable();
             }
         }
     }
