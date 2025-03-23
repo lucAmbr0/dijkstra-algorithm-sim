@@ -246,7 +246,6 @@ function highlightNode(node, priority) {
     }
 }
 
-changeSpeed(); // imposta la velocità iniziale
 function changeSpeed() {
     const speedSlider = document.getElementById("animationSpeed");
     animationSpeed = 5000 - (speedSlider.value - 1) * 45;

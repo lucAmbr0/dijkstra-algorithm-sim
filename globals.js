@@ -19,5 +19,5 @@ class Node {
 let nodes = [];
 let numberOfRouters = 0;
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"];
-let animationSpeed = 50;
+let animationSpeed = 2350;
 let logs = 0;

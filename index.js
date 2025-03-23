@@ -2,6 +2,7 @@ generateGraph();
 function generateGraph() {
     try {
         clearLog();
+        changeSpeed(); // imposta la velocità iniziale
         log("New graph created");
         numberOfRouters = document.getElementById("numberOfRouters").value;
         if (numberOfRouters >= 5 && numberOfRouters <= 15) {
@@ -95,6 +96,8 @@ async function runAlgorithmOnNode(node) {
         previousNodes[n.name] = null;
         n.finished = false;
     });
+
+    node.connections.sort((a, b) => a.distance - b.distance);
 
     distances[node.name] = 0;
     nodesToVisit.insert({ node: node, distance: 0 });
