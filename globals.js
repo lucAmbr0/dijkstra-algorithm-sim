@@ -17,14 +17,5 @@ class Node {
 }
 
 const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"];
-let nodes;
-let numberOfRouters;
-let animationSpeed;
-let logs;
-
-function assignGlobals() {
-    nodes = [];
-    numberOfRouters = 0;
-    animationSpeed = 50;
-    logs = 0;
-}
+let animationSpeed = 2350;
+let logs = 0;
