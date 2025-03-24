@@ -47,15 +47,18 @@ There are no strict requirements, but for an optimal experience:
 ```
 dijkstra-algorithm-sim
 │
-|  globals.js
-|  index.html
-|  index.js
-|  LICENSE
-|  minHeap.js
-|  README.md
-|  style.css
-|  UIchanges.js
-├───
+│   globals.js
+│   index.html
+│   index.js
+│   LICENSE
+│   minHeap.js
+│   README.md
+│   style.css
+│   UIchanges.js
+│
+└───screenshots
+        desktop-screenshot-1.png
+        desktop-screenshot-2.png
 ```
 
 ## :cherry_blossom: Community
@@ -91,7 +94,6 @@ No strict guidelines—just keep the code clean and organized for better collabo
   No, all graph data is processed locally in your browser, ensuring privacy and efficiency.
 
 ##  :camera: Gallery
-Not available yet, stay tuned!
 <div style="display: flex">
 <!-- Placeholder for future screenshots -->
 </div>
